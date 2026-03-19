@@ -6,8 +6,13 @@ token = os.environ['TELEGRAM_TOKEN']
 chat_id = "-1003790934369"
 
 def send_telegram(message):
+    # HTML 모드를 사용해서 링크를 예쁘게 만듭니다
     url = f"https://api.telegram.org/bot{token}/sendMessage"
-    params = {'chat_id': chat_id, 'text': message}
+    params = {
+        'chat_id': chat_id, 
+        'text': message,
+        'parse_mode': 'HTML' # 링크 클릭이 가능하게 해주는 설정
+    }
     requests.get(url, params=params)
 
 def check_imax():
@@ -17,14 +22,12 @@ def check_imax():
         response = requests.get(url)
         html = response.text
         
-        # 사키님이 노리시는 25, 26, 27일 날짜 키워드들
         target_dates = [
             '03/25', '03.25', '3월 25', '20240325', 
             '03/26', '03.26', '3월 26', '20240326',
             '03/27', '03.27', '3월 27', '20240327'
         ]
         
-        # '프로젝트 헤일메리'와 'IMAX'가 있으면서, 해당 날짜 중 하나라도 뜨면 성공!
         if '프로젝트 헤일메리' in html and 'IMAX' in html:
             for date in target_dates:
                 if date in html:
@@ -35,7 +38,11 @@ def check_imax():
 
 # 실행 부분
 if check_imax():
-    msg = "🚨 [용아맥 알림] 사키님! 3월 25, 26, 27일 중 '프로젝트 헤일메리' IMAX 예매가 열렸습니다! 지금 바로 접속하세요! 🎬"
+    # 예매 페이지로 바로 가는 링크를 포함한 멘트입니다
+    booking_url = "http://m.cgv.co.kr/WebApp/Reservation/TimeTable.aspx?theatercode=0013"
+    msg = (
+        "🚨 <b>[용아맥 알림] 프로젝트 헤일메리 오픈!</b>\n\n"
+        "사키님! 3월 25~27일 예매가 열린 것 같습니다!\n"
+        f"👉 <a href='{booking_url}'>지금 바로 예매하러 가기 (클릭)</a>"
+    )
     send_telegram(msg)
-
-
