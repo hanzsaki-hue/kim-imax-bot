@@ -22,7 +22,7 @@ def check_imax():
         return False
 
 # 실행 부분
-if check_imax():
+
     # 사키님이 원하시는 깔끔한 문구로 수정했습니다!
     msg = "🚨 [용아맥 알림] '프로젝트 헤일메리' IMAX 예매가 열린 것 같습니다! 지금 바로 확인하세요! 🎬"
     send_telegram(msg)
