@@ -1,21 +1,25 @@
 import requests
+import os
 
-# 1. 방금 찾은 진짜 주소와 검증된 토큰을 넣었습니다.
+# 1. 정보 설정 (토큰과 ID를 코드에 직접 박았습니다)
 token = "8586869049:AAHr9gr2LmutAHDAWBYBOXmBLDO0m_11Z2U"
 chat_id = "-1003790934369" 
 
 def send_telegram(message):
     url = f"https://api.telegram.org/bot{token}/sendMessage"
     params = {'chat_id': chat_id, 'text': message}
-    requests.get(url, params=params)
+    response = requests.get(url, params=params)
+    print(response.json()) # 실행 결과 로그 남기기
 
 def check_imax():
-    # CGV 용산 아이파크몰 시간표 페이지
+    # CGV 용산아이파크몰 시간표 페이지
     url = "http://m.cgv.co.kr/WebApp/Reservation/TimeTable.aspx?theatercode=0013"
     try:
         response = requests.get(url)
-        # 페이지 안에 '프로젝트 헤일메리'와 'IMAX' 글자가 모두 있는지 확인
-        if '프로젝트 헤일메리' in response.text and 'IMAX' in response.text:
+        html = response.text
+        
+        # 오늘(20일)은 무조건 영화가 있으니 이 두 단어는 무조건 걸립니다.
+        if '프로젝트 헤일메리' in html and 'IMAX' in html:
             return True
         return False
     except:
@@ -23,10 +27,10 @@ def check_imax():
 
 # 실행 부분
 if check_imax():
-    # 영화가 떴을 때 보내는 실제 알람 멘트
-    msg = "🚨 [용아맥 알림] '프로젝트 헤일메리' IMAX 예매가 열린 것 같습니다! 지금 바로 확인하세요! 🎬"
+    booking_url = "http://m.cgv.co.kr/WebApp/Reservation/TimeTable.aspx?theatercode=0013"
+    msg = (
+        "🚨 [용아맥 감시 중] 프로젝트 헤일메리 발견!\n\n"
+        "사키님, 이 메시지가 오면 봇은 살아있는 겁니다.\n"
+        f"바로가기: {booking_url}"
+    )
     send_telegram(msg)
-
-# 테스트용 (제대로 연결됐는지 단톡방에 바로 쏴봅니다!)
-# 나중에 테스트가 끝나면 아래 줄 앞에 #을 붙여서 지워주세요.
-send_telegram("✅ [용아맥 연결 성공] 사키님, 여자친구분! 이제 봇이 5분마다 감시를 시작합니다. 푹 주무세요! 🎬")
